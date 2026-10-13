@@ -35,14 +35,17 @@ function Register() {
                 }
             },
             (error) => {
-                if (error.response) {
-                    const resMessage = error.response.data.response
+                if (error.response && error.response.data && error.response.data.response) {
+                    let resMessage = error.response.data.response;
+                    if (typeof resMessage === 'string') {
+                        resMessage = resMessage.replace(/^\[|\]$/g, '');
+                    }
                     setResponseError(resMessage);
-                    console.log(error.response.data);
-                }else {
-                    setResponseError("Registration failed: Something went wrong!")
+                } else if (error.message) {
+                    setResponseError("Connection failed: " + error.message + ". Make sure backend is running.");
+                } else {
+                    setResponseError("Registration failed: Something went wrong!");
                 }
-                
             }
           );
         setIsLoading(false);
@@ -61,7 +64,15 @@ function Register() {
                     <input 
                         type='text'
                         {...register('username', {
-                            required: "Username is required!"
+                            required: "Username is required!",
+                            minLength: {
+                                value: 3,
+                                message: "Username must have at least 3 characters!"
+                            },
+                            maxLength: {
+                                value: 20,
+                                message: "Username can have at most 20 characters!"
+                            }
                         })}
                     />
                     {formState.errors.username && <small>{formState.errors.username.message}</small>}
