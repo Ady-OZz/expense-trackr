@@ -58,11 +58,12 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/mywallet/auth/**").permitAll()
+                        auth
+                                // Public: sign-up / sign-in / password-reset flows
+                                .requestMatchers("/mywallet/auth/**").permitAll()
+                                // Public: transaction type list needed before login (e.g. register form)
                                 .requestMatchers("/mywallet/transactiontype/**").permitAll()
-                                .requestMatchers("/mywallet/category/**").permitAll()
-                                .requestMatchers("/mywallet/transaction/**").permitAll()
-                                .requestMatchers("/mywallet/user/**").permitAll()
+                                // Everything else requires a valid JWT
                                 .anyRequest().authenticated()
                 );
 
